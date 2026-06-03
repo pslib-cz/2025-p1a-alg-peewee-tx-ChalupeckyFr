@@ -1,24 +1,22 @@
+//**ovladac**
 radio.setGroup(23)
 radio.setTransmitSerialNumber(true)
-input.onButtonPressed(Button.A, function () {
-    basic.showNumber(control.deviceSerialNumber())
-})
 
-while (true) {
+basic.forever(function(){
     let pressedA = input.buttonIsPressed(Button.A)
     let pressedB = input.buttonIsPressed(Button.B)
+    let pressedLogo = input.logoIsPressed()
     if (pressedA && pressedB) {
-
         radio.sendString("goForward")
-    }
-    else if (pressedB) {
-        radio.sendString("turnRight")
-    }
-    else if (pressedA ) {
+    } 
+   else if(pressedLogo){
+       radio.sendString("goBack")
+   }
+    else if (pressedA) {
         radio.sendString("turnLeft")
-    }
-    else {
+    } else if (pressedB) {
+        radio.sendString("turnRight")
+    } else {
         radio.sendString("stop")
-    }
-    basic.pause(50)
-}
+    }    
+})
