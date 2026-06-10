@@ -1,5 +1,5 @@
 // *Kód pro ovladač*
-// AI bylo použito na to aby mi nám poradilo jak fungují nějaké funkce (eg. Math.map, Rotation.Pitch/Roll),
+// AI bylo použito na to aby nám poradilo jak fungují nějaké funkce (eg. Math.map, Rotation.Pitch/Roll),
 // také bylo použito pro debugging a kontrolu logiky u některých částí kódu
 
 radio.setGroup(23)
@@ -8,6 +8,7 @@ radio.setTransmitSerialNumber(true)
 let weStarted: boolean = false
 let recentGear = 2
 let speedLimit = 60
+let lastGearChange = 0
 
 function showDegree() {
     if (recentGear == 0) {
@@ -38,20 +39,20 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 input.onButtonPressed(Button.A, function () {
     if (!weStarted) {
         return
-    }
-    if (input.buttonIsPressed(Button.B)) {
+    } if (input.buttonIsPressed(Button.B)) {
+        return
+    } if (control.millis() - lastGearChange < 300) {
         return
     }
+
     if (recentGear > 0) {
         recentGear -= 1
-    }
-    if (recentGear == 0) {
+        lastGearChange = control.millis()
+    } if (recentGear == 0) {
         speedLimit = 30
-    }
-    if (recentGear == 1) {
+    } if (recentGear == 1) {
         speedLimit = 30
-    }
-    if (recentGear == 2) {
+    } if (recentGear == 2) {
         speedLimit = 60
     }
     showDegree()
@@ -60,20 +61,20 @@ input.onButtonPressed(Button.A, function () {
 input.onButtonPressed(Button.B, function () {
     if (!weStarted) {
         return
-    }
-    if (input.buttonIsPressed(Button.A)) {
+    } if (input.buttonIsPressed(Button.A)) {
+        return
+    } if (control.millis() - lastGearChange < 300) {
         return
     }
+
     if (recentGear < 3) {
         recentGear += 1
-    }
-    if (recentGear == 1) {
+        lastGearChange = control.millis()
+    } if (recentGear == 1) {
         speedLimit = 30
-    }
-    if (recentGear == 2) {
+    } if (recentGear == 2) {
         speedLimit = 60
-    }
-    if (recentGear == 3) {
+    } if (recentGear == 3) {
         speedLimit = 100
     }
     showDegree()
@@ -82,12 +83,10 @@ input.onButtonPressed(Button.B, function () {
 basic.showIcon(IconNames.Asleep)
 
 basic.forever(function () {
-    if (!weStarted) {
-        return
-    }
+    if (!weStarted) { return }
 
     let x = input.rotation(Rotation.Roll)
-    if (Math.abs(x) < 15) {
+    if (Math.abs(x) < 5) {
         x = 0
     }
 
@@ -106,5 +105,5 @@ basic.forever(function () {
     let msg = "X" + Math.round(ourX) + "Y" + Math.round(ourY) + "G" + recentGear
     radio.sendString(msg)
 
-    basic.pause(50)
+    basic.pause(20)
 })
